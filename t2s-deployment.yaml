@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: t2s-deployment
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            component: t2s-backend
+    template:
+        metadata:
+            labels:
+                component: t2s-backend
+        spec:
+            volumes:
+              - name: storage-key
+                secret:
+                  secretName: storage-key
+            containers:
+                - name: server
+                  image: geckocambridge/voice_l2:v1
+                  ports:
+                    - containerPort: 8000
+                  volumeMounts:
+                    - name: storage-key
+                      mountPath: /var/secrets/google
+                      readOnly: true
+                  env:
+                    - name: GOOGLE_APPLICATION_CREDENTIALS
+                      value: /var/secrets/google/firebase.json

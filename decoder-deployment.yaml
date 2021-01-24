@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: decoder-deployment
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            component: decoder-backend
+    template:
+        metadata:
+            labels:
+                component: decoder-backend
+        spec:
+            volumes:
+              - name: storage-key
+                secret:
+                  secretName: storage-key
+            containers:
+                - name: server
+                  image: geckocambridge/decoder:v3
+                  volumeMounts:
+                    - name: storage-key
+                      mountPath: /var/secrets/google
+                      readOnly: true
+                  env:
+                    - name: GOOGLE_APPLICATION_CREDENTIALS
+                      value: /var/secrets/google/firebase.json
